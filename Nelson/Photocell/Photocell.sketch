@@ -12,6 +12,7 @@ void setup()
 {
   pinMode(lampPin, OUTPUT);
   Serial.begin(9600);
+  Serial.println("lampMIN\tlampMAX\tlampAVG\tLED");
 }
 void getLampMinMax()
 {
