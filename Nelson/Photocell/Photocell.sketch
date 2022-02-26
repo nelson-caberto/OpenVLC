@@ -1,11 +1,11 @@
 //www.elegoo.com
 //2016.12.9
 
-#define lightPin 0;
-#define latchPin 11;
-#define clockPin 9;
-#define dataPin 12;
-#define lampPin 8;
+#define lightPin 0
+#define latchPin 11
+#define clockPin 9
+#define dataPin 12
+#define lampPin 8
 
 int reading;
 int numLEDSLit;
