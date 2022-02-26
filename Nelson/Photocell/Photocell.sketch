@@ -1,35 +1,17 @@
-//www.elegoo.com
-//2016.12.9
-
-#define lightPin 0
-#define latchPin 11
-#define clockPin 9
-#define dataPin 12
+#define photoPin 0
 #define lampPin 8
+#define samples 10000
 
 int reading;
-int numLEDSLit;
-int leds = 0;
 int lampMIN;
 int lampMAX;
 long lampAVG;
-
 int brightness = 0;
 
 void setup() 
 {
-  pinMode(latchPin, OUTPUT);
-  pinMode(dataPin, OUTPUT);  
-  pinMode(clockPin, OUTPUT);
   pinMode(lampPin, OUTPUT);
   Serial.begin(9600);
-  updateShiftRegister();
-}
-void updateShiftRegister()
-{
-   digitalWrite(latchPin, LOW);
-   shiftOut(dataPin, clockPin, LSBFIRST, leds);
-   digitalWrite(latchPin, HIGH);
 }
 void getLampMinMax()
 {
@@ -37,20 +19,18 @@ void getLampMinMax()
   lampMIN = 1000;
   lampMAX = 0;
   lampAVG = 0;
-  for (int i = 1; i < 10000; i++)
+  for (int i = 1; i < samples; i++)
   {
-    reading = analogRead(lightPin);
+    reading = analogRead(photoPin);
     lampAVG += reading;
     if (reading < lampMIN) lampMIN = reading;
     if (reading > lampMAX) lampMAX = reading;
   }
-  lampAVG /= 9999;
+  lampAVG /= samples - 1;
   analogWrite(lampPin,0);
 }
 void serialout()
 {
-  Serial.print(reading);
-  Serial.print("\t");
   Serial.print(lampMIN);
   Serial.print("\t");
   Serial.print(lampMAX);
@@ -61,16 +41,6 @@ void serialout()
 }
 void loop() 
 {
-//  reading  = analogRead(lightPin);
-//  numLEDSLit = reading / 57;  //1023 / 9 / 2
-//  if (numLEDSLit > 8) numLEDSLit = 8;
-//  leds = 0;   // no LEDs lit to start
-//  for (int i = 0; i < numLEDSLit; i++)
-//  {
-//    leds = leds + (1 << i);  // sets the i'th bit
-//  }
-//  updateShiftRegister();
-
   getLampMinMax();
   serialout();
   brightness++;
