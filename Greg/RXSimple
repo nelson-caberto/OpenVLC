@@ -1,0 +1,41 @@
+#define lightPin 0
+#define lampPin 8
+
+int reading;
+int dimmingValue;
+int receivedBit;
+int bitValue;
+const int reset=0;
+void setup () {
+  // put your setup code here, to run once:
+  pinMode(lampPin, OUTPUT);
+  pinMode(lightPin, INPUT);
+  Serial.begin(9600); 
+}
+
+void loop () {
+
+  Serial.println("Enter A Value:");
+  while (Serial.available() == 0) {
+}
+
+  bitValue = Serial.parseInt();
+  Serial.println(bitValue);
+  if(bitValue == 0) {
+    dimmingValue = 5;
+    analogWrite(lampPin, 50);
+    Serial.println(dimmingValue);
+  }
+  else if(bitValue == 1)  {
+    dimmingValue = 200;
+    analogWrite(lampPin, 200);
+    Serial.println(dimmingValue);
+    
+  }
+  else {
+    Serial.println("Number not recognized");
+    Serial.println(dimmingValue);
+    
+  }
+  delay(1000);
+}
