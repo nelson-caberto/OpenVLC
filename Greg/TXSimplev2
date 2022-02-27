@@ -1,0 +1,24 @@
+#define analogOutPin 8
+void setup()  {
+  // put your setup code here, to run once:
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600);
+ 
+}
+
+void loop() {
+  Serial.println("Enter A Value:");
+  while (Serial.available() == 0) {
+    
+  }
+  //Receive 0 or 1 from user
+  int Value = Serial.parseInt();
+  if (60 <= Value && Value <= 492){
+    Serial.println("Received a 0");
+  }
+  else if (502 <= Value && Value <= 667){
+    Serial.println("Received a 1");
+  }
+  
+  analogWrite(analogOutPin, Value);
+}
