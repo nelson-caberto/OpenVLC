@@ -18,15 +18,15 @@ void encode(int num) {
 
 void showBits() {
   Serial.print("Data:");
-  for (int i = 1; i<9; i++){
-    Serial.print((int)bits[i]);
+  for (int i = 0; i<8; i++){
+    Serial.print(bits[i]);
   }
   Serial.println();
 }
 
 void sendBits() {
   Serial.print("Send:");
-  for (int i = 1; i<9; i++) {
+  for (int i = 0; i<8; i++) {
     switch((int)bits[i]) {
       case 0:
         analogWrite(lampPin,5);
@@ -37,7 +37,7 @@ void sendBits() {
       default:
       break;
     }
-    Serial.print((int)bits[i]);
+    Serial.print(bits[i]);
     delay(310);
     analogWrite(lampPin,0);
     delay(310);
