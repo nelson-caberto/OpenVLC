@@ -30,15 +30,18 @@ int readBit() {
 }
 
 void showBits() {
-  Serial.print("Data:");
+  Serial.print("Bits:");
   for (int i = 0; i<bitlength; i++){
     Serial.print(bits[i]);
   }
   Serial.println();
   parityBit = 0;
+  Serial.print("Data:");
   for (int i = 0; i<bitlength-1; i++) {
+    Serial.print(bits[i]);
     parityBit+=bits[i];
   }
+  Serial.println();
   if (bits[bitlength-1]!=parityBit%2) {
     Serial.println("Parity Bit Fail - Need to Retransmit Data");
   }
