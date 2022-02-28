@@ -1,6 +1,6 @@
 #define photoPin 0
 #define lampPin 8
-#define samples 10000
+#define samples 2000
 
 int reading;
 int lampMIN;

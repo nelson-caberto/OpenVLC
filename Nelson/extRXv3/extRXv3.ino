@@ -6,9 +6,9 @@ int currentValue;
 int previousValue = -1;
 bool bits[bitlength] = {0,0,0,0,0,0,0,0,0};
 int iterator = 0;
-int startTime = 0;
+int startTimeout = 0;
 int currentTime = 0;
-bool trackTime = false;
+bool trackTimeout = false;
 int parityBit = 0;
 
 void setup()
@@ -49,23 +49,23 @@ void keepBit(int value) {
   if (iterator==bitlength-1) {
     showBits();
     iterator = -1;
-    trackTime = false;
+    trackTimeout = false;
   }
   iterator++;
 }
 
-void startTimer() {
-  startTime = millis();
-  trackTime = true;
+void startTimeoutTracking() {
+  startTimeout = millis();
+  trackTimeout = true;
 }
 
-void checkTimer() {
-  if (trackTime == false)
+void checkTimeout() {
+  if (trackTimeout == false)
     return;
   currentTime = millis();
-  if (currentTime - startTime > timeout) {
+  if (currentTime - startTimeout > timeout) {
     Serial.println("Timeout");
-    trackTime = false;
+    trackTimeout = false;
     iterator = 0;
   }
 }
@@ -74,15 +74,16 @@ void loop()
 {
   currentValue = readBit();
   if (currentValue != previousValue) {
-    delay(310);
+    delay(25);
+    currentValue = readBit();
   }
   if (currentValue != previousValue) {
     if (currentValue != -1) {
       Serial.println(currentValue);
-      startTimer();
+      startTimeoutTracking();
       keepBit(currentValue);
     }
     previousValue = currentValue;
   }
-  checkTimer();
+  checkTimeout();
 }

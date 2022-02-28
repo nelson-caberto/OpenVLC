@@ -43,9 +43,9 @@ void sendBits() {
       break;
     }
     Serial.print(bits[i]);
-    delay(320);
+    delay(50);
     analogWrite(lampPin,0);
-    delay(310);
+    delay(50);
   }
   Serial.println();
 }

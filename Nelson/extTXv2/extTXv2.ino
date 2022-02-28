@@ -10,7 +10,7 @@ void setup()
 }
 
 void encode(int num) {
-  for (int i = 8; i > 0; i--) {
+  for (int i = 7; i >= 0; i--) {
     bits[i] = num%2;
     num=num/2;
   }
@@ -38,7 +38,7 @@ void sendBits() {
       break;
     }
     Serial.print(bits[i]);
-    delay(310);
+    delay(320);
     analogWrite(lampPin,0);
     delay(310);
   }
@@ -47,9 +47,11 @@ void sendBits() {
 
 void loop() 
 {
-  Serial.println("Value:");
+  Serial.println("Waiting for input...");
   while (Serial.available() == 0) {}
   value = Serial.parseInt();
+  Serial.print("Input:");
+  Serial.println(value);
   encode(value);
   showBits();
   sendBits();
