@@ -22,7 +22,7 @@ char readBit() {
   for (int i = 0; i<PR_reads; i++ ) prAVG += analogRead(PR_Pin);
   prAVG /= PR_reads;
   switch(prAVG) {
-    case   0 ...  10: return -1;
+    case   0 ...   2: return -1;
     case  40 ...  95: return 0;
     case 125 ... 222: return 1;
     case 263 ... 370: return 2;
