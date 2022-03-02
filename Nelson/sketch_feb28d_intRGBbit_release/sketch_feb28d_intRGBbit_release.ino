@@ -1,5 +1,3 @@
-/* Use to fine tune readBit Range */
-
 #define LEDr_Pin 10
 #define LEDg_Pin 9
 #define LEDb_Pin 8
@@ -17,12 +15,12 @@ void setup() {
   Serial.begin(9600);
 }
 
-char readBit() {
+byte readBit() {
   prAVG = 0;
   for (int i = 0; i<PR_reads; i++ ) prAVG += analogRead(PR_Pin);
   prAVG /= PR_reads;
   switch(prAVG) {
-    case   0 ...   2: return -1;
+    case   0 ...   2: return -1;  //represented as 255
     case  40 ...  95: return 0;
     case 125 ... 222: return 1;
     case 263 ... 370: return 2;
