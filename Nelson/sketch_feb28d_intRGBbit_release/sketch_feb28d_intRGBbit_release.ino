@@ -26,7 +26,7 @@ byte readBit() {
     case 263 ... 370: return 2;
     case 390 ... 555: return 3;
     case 762 ... 771: return 4;
-    case 825 ... 832: return 5;
+    case 817 ... 832: return 5;
     case 907 ... 913: return 6;
     case 938 ... 944: return 7;
     default: return readBit();
@@ -49,9 +49,9 @@ void sendBit(byte oct) {
     case 5: setLED(  0,255,  0); break;
     case 6: setLED(255,  0,  1); break;
     case 7: setLED(255,255,255); break;
-    default:
-    break;
+    default: break;
   }
+  delay(30);
 }
 
 byte getInput(String s) {
@@ -65,7 +65,6 @@ void loop() {
   Serial.print("Data:");
   Serial.println(input);
   sendBit(input);
-  delay(30);
   output = readBit();
   Serial.print("Read:");
   Serial.println(output);

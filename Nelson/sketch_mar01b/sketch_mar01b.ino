@@ -1,5 +1,3 @@
-/* Use to fine tune readBit Range */
-
 #define LEDr_Pin 10
 #define LEDg_Pin 9
 #define LEDb_Pin 8
@@ -21,10 +19,8 @@ byte readBit() {
   prAVG = 0;
   for (int i = 0; i<PR_reads; i++ ) prAVG += analogRead(PR_Pin);
   prAVG /= PR_reads;
-  Serial.print(" prAVG:");
-  Serial.print(prAVG);
   switch(prAVG) {
-    case   0 ...   2: return -1;
+    case   0 ...   2: return -1;  //represented as 255
     case  40 ...  95: return 0;
     case 125 ... 222: return 1;
     case 263 ... 370: return 2;
@@ -53,34 +49,34 @@ void sendBit(byte oct) {
     case 5: setLED(  0,255,  0); break;
     case 6: setLED(255,  0,  1); break;
     case 7: setLED(255,255,255); break;
-    default:
-    break;
+    default: break;
   }
-}
-
-byte getInput(String s) {
-  Serial.println(s);
-  while (Serial.available() == 0) {}
-  return Serial.parseInt();
+  delay(30);
 }
 
 void loop() {
-  int aMIN = 1000, aMAX = 0;
-  long current = 0;
-  input = getInput("Waiting for byte value...");
-  for (int i = 0; i<10; i++) {
-    sendBit(input);
-    delay(30);
-    output = readBit();
-    current = prAVG;
-    if (current>aMAX) aMAX = current;
-    if (current<aMIN) aMIN = current;
+  Serial.println("Begin");
+  for (input = 0; input<8; input++) {
+    Serial.print("Data:");
+    Serial.print(input);
     Serial.print(" ");
-    Serial.println(output);
+    sendBit(input);
+    output = readBit();
+    Serial.print("Read:");
+    Serial.print(output);
+    if (input == output)
+      Serial.print(" Match");
+    else {
+      delay(3000);
+    }
+    Serial.println();
     setLED(0,0,0);
+    delay(155);
   }
-  Serial.print("aMIN:");
-  Serial.print(aMIN);
-  Serial.print(" aMAX:");
-  Serial.println(aMAX);
+  Serial.println("End");
 }
+
+/*
+ * Learned going from 255,255,255 to 0,0,0
+ * requires delay(155)
+ */

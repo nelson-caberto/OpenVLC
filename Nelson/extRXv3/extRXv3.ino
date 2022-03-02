@@ -55,7 +55,7 @@ void keepBit(int value) {
     trackTimeout = false;
   }
   iterator++;
-}
+} 
 
 void startTimeoutTracking() {
   startTimeout = millis();
