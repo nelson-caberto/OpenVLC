@@ -22,7 +22,6 @@ void loop() {
     prAVGcurrent = 0;
     prMINcurrent = prMINprevious = 1100;
     prMAXcurrent = prMAXprevious = 0;
-    startTime = micros();
     for (int i = 0; i<prREADs; i++ ) {
       currentValue = analogRead(PR_Pin);
       if (currentValue>prMAXcurrent) {
@@ -47,6 +46,10 @@ void loop() {
     if (prMINprevious == prMINcurrent && prMAXprevious == prMAXcurrent && prAVGprevious == prAVGcurrent)
       prREADs = 1;
     prAVGprevious = prAVGcurrent;
+    startTime = micros();
+    for (int i = 0; i<prREADs; i++) {
+      currentValue = analogRead(PR_Pin);
+    }
     endTime = micros();
     elapsedTime = endTime-startTime;
     Serial.print("prMIN:\t");
