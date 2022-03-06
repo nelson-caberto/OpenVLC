@@ -40,4 +40,5 @@ void loop() {
   Serial.print("Data:");
   Serial.println(tx);
   sendBit(tx);
+  delay(5);
 }

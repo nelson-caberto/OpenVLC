@@ -31,7 +31,7 @@ void loop() {
   if (currentRX != previousRX) {
     if (currentRX != 255) {
       Serial.println(currentRX);
-//      delay(25);
+      delay(30);
     }
     previousRX = currentRX;
   }
