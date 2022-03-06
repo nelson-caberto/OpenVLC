@@ -13,6 +13,7 @@ byte readBit() {
   prAVG = 0;
   for (int i = 0; i<PR_reads; i++ ) prAVG += analogRead(PR_Pin);
   prAVG /= PR_reads;
+  Serial.println(prAVG);
   switch(prAVG) {
     case  40 ...  95: return 0;
     case 125 ... 222: return 1;
