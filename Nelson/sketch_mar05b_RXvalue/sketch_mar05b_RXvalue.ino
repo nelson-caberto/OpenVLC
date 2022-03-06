@@ -15,14 +15,10 @@ byte readBit() {
   prAVG /= PR_reads;
   Serial.println(prAVG);
   switch(prAVG) {
-    case  40 ...  95: return 0;
-    case 125 ... 222: return 1;
-    case 263 ... 370: return 2;
-    case 390 ... 555: return 3;
-    case 762 ... 771: return 4;
-    case 817 ... 832: return 5;
-    case 907 ... 913: return 6;
-    case 938 ... 944: return 7;
+    case 760 ... 780: return 0;
+    case 820 ... 840: return 1;
+    case 895 ... 915: return 2;
+    case 925 ... 935: return 3;
     default: return -1;
   }
 }

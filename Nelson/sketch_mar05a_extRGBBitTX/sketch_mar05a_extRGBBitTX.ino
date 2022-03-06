@@ -19,17 +19,13 @@ void setLED(byte r, byte g, byte b) {
 
 void sendBit(byte oct) {
   switch(oct) {
-    case 0: setLED(  0,  0,  1); break;
-    case 1: setLED(  1,  0,  0); break;
-    case 2: setLED(  1,  2,  1); break;
-    case 3: setLED(  6,  0,  0); break;
-    case 4: setLED(  0,  0,255); break;
-    case 5: setLED(  0,255,  0); break;
-    case 6: setLED(255,  0,  1); break;
-    case 7: setLED(255,255,255); break;
+    case 0: setLED(  1,  1,  1); break;
+    case 1: setLED(  0,  0,255); break;
+    case 2: setLED(  0,255,  0); break;
+    case 3: setLED(255,  0,  0); break;
     default: break;
   }
-  delay(35);
+  delay(50);
   setLED(0,0,0);
 }
 

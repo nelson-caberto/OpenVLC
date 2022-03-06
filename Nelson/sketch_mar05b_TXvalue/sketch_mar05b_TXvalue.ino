@@ -27,5 +27,10 @@ void loop() {
   r = getInput("Waiting for RED value...");
   g = getInput("Waiting for GREEN value...");
   b = getInput("Waiting for BLUE value...");
+  Serial.print(r);
+  Serial.print(" ");
+  Serial.print(g);
+  Serial.print(" ");
+  Serial.println(b);
   setLED(r, g, b);
 }

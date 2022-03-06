@@ -14,14 +14,10 @@ byte readBit() {
   for (int i = 0; i<PR_reads; i++ ) prAVG += analogRead(PR_Pin);
   prAVG /= PR_reads;
   switch(prAVG) {
-    case  40 ...  95: return 0;
-    case 125 ... 222: return 1;
-    case 263 ... 370: return 2;
-    case 390 ... 555: return 3;
-    case 762 ... 771: return 4;
-    case 817 ... 832: return 5;
-    case 907 ... 913: return 6;
-    case 938 ... 944: return 7;
+    case 150 ... 350: return 0;
+    case 760 ... 780: return 1;
+    case 820 ... 840: return 2;
+    case 895 ... 915: return 3;
     default: return -1;
   }
 }
@@ -35,7 +31,7 @@ void loop() {
   if (currentRX != previousRX) {
     if (currentRX != 255) {
       Serial.println(currentRX);
-      delay(150);
+//      delay(25);
     }
     previousRX = currentRX;
   }
