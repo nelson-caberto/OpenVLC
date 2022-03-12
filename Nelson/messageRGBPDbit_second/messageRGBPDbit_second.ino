@@ -1,10 +1,27 @@
-#define PR_Pin 0
+#define PR_Pin    0
 #define LEDr_Pin 10
-#define LEDg_Pin 9
+#define LEDg_Pin  9
 #define LEDb_Pin  8
-#define PR_reads 40
 
-byte tx, rx;
+#define TX_ON_DELAY  75  //how long to wait after turning on the LED
+#define TX_OFF_DELAY 75  //how long to wait after turning off the LED
+
+#define RX_DELAY    25  //if RX input changes, wait before getting actual reading
+
+//these are specific to each LED, lamp, etc
+#define RX0_LO  100
+#define RX0_HI  275
+#define RX1_LO  590
+#define RX1_HI  620
+#define RX2_LO  690
+#define RX2_HI  725
+#define RX3_LO  860
+#define RX3_HI  880
+
+#define RX_READS 20
+#define RX_OFF  255
+
+byte tx, rx, rxP = RX_OFF;
 
 void setup() {
   pinMode(PR_Pin, INPUT);
@@ -16,14 +33,14 @@ void setup() {
 
 byte readBit() {
   long prAVG = 0;
-  for (int i = 0; i<PR_reads; i++) prAVG += analogRead(PR_Pin);
-  prAVG /= PR_reads;
+  for (int i = 0; i<RX_READS; i++) prAVG += analogRead(PR_Pin);
+  prAVG /= RX_READS;
   switch(prAVG) {
-    case 100 ... 275: return 0; //red min
-    case 590 ... 620: return 1; //blue max
-    case 690 ... 710: return 2; //green max
-    case 860 ... 880: return 3; //red max
-    default: return 255;
+    case RX0_LO ... RX0_HI: return 0; //red min
+    case RX1_LO ... RX1_HI: return 1; //blue max
+    case RX2_LO ... RX2_HI: return 2; //green max
+    case RX3_LO ... RX3_HI: return 3; //red max
+    default: return RX_OFF;
   }
 }
 
@@ -49,16 +66,33 @@ void ledOn() {
 
 void sendBit() {
   ledOn();
-  delay(75);
+  delay(TX_ON_DELAY);
   ledOff();
-  delay(75);
+  delay(TX_OFF_DELAY);
 }
 
-void loop() {
+void processRX() {
   rx = readBit();
-  if (rx != 255) Serial.println(rx);
+  if (rx != rxP) {
+    delay(RX_DELAY);
+    rx = readBit();
+  }
+  if (rx != rxP) {
+    if (rx != RX_OFF) {
+      Serial.println(rx);
+    }
+  rxP = rx;
+  }
+}
+
+void processTX() {
   if (Serial.available() > 0) {
     tx = Serial.parseInt();
     sendBit();
   }
+}
+
+void loop() {
+  processRX();
+  processTX();
 }
