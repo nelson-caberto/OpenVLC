@@ -1,5 +1,6 @@
 function send() {
     let msg = document.getElementById('msg').value;
+    if (msg == '') return;
     document.getElementById('msg').value = '';
     fetch(`/add/${msg}`);
 }
