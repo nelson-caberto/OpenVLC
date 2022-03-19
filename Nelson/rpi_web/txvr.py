@@ -87,16 +87,14 @@ class txvr:
 
     def __sendByte(self):
         msg = self.tx
+        parity = 0
         for char in msg:
             bitS = '{0:08b}'.format(ord(char))
-            print(bitS[0])
-            self.tx = int(bitS[0])+int(bitS[1])
-            self.__sendBit()
-            self.tx = int(bitS[2])+int(bitS[3])
-            self.__sendBit()
-            self.tx = int(bitS[4])+int(bitS[5])
-            self.__sendBit()
-            self.tx = int(bitS[6])+int(bitS[7])
+            for i in range(0,8,2):
+                self.tx = int(bitS[i])+int(bitS[+1])
+                parity += self.tx
+                self.__sendBit()
+            self.tx = parity % 2
             self.__sendBit()
 
     def __processTX(self):
