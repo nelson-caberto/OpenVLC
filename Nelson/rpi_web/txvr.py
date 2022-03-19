@@ -2,6 +2,7 @@ from multiprocessing.reduction import DupFd
 from queue import Queue
 from threading import Thread
 from time import sleep
+from math import floor
 import RPi.GPIO as GPIO
 import board
 import busio
@@ -40,30 +41,57 @@ class txvr:
         print('Adding Message: ',data)
         print('New Queue Size: ',self.q.qsize())
         
-    def __readBit():
-        value = AnalogIn(ads, ADS.PO).value
-        if 3400 < value and value < 3430: return 0
-        if 3560 < value and value < 3590: return 1
-        if 3610 < value and value < 3640: return 2
-        if 3940 < value and value < 3960: return 3
+    def __readBit(self):
+        value = floor(AnalogIn(ads, ADS.P0).voltage*100)/100
+        if value == 0.47: return 0  #G 3740 0.47
+        if value == 0.46: return 1  #B 3610 0.46
+        if value == 0.49: return 2  #R 3890 0.49
+        if value == 0.52: return 3  #RGB 4120 0.51
         return -1
 
     def __processRX(self):
         self.rx = self.__readBit()
         if self.rx != self.rxP:
-            sleep(25/1000)
-            self.rx = self.__reaBit()
+            sleep(50/1000)
+            self.rx = self.__readBit()
         if self.rx != self.rxP:
             if self.rx != -1:
                 print('RX ',self.rx)
+                self.msgs.append(self.rx)
+                self.trimMsgs()
             self.rxP = self.rx
 	
+    def __ledOn(self):
+        if   self.tx == 0: GPIO.output(RGBg,GPIO.HIGH)
+        elif self.tx == 1: GPIO.output(RGBb,GPIO.HIGH)
+        elif self.tx == 2: GPIO.output(RGBr,GPIO.HIGH)
+        elif self.tx == 3:
+            GPIO.output(RGBr,GPIO.HIGH)
+            GPIO.output(RGBg,GPIO.HIGH)
+            GPIO.output(RGBb,GPIO.HIGH)
+
+    def __ledOff(self):
+        if   self.tx == 0: GPIO.output(RGBg,GPIO.LOW)
+        elif self.tx == 1: GPIO.output(RGBb,GPIO.LOW)
+        elif self.tx == 2: GPIO.output(RGBr,GPIO.LOW)
+        elif self.tx == 3:
+            GPIO.output(RGBr,GPIO.LOW)
+            GPIO.output(RGBg,GPIO.LOW)
+            GPIO.output(RGBb,GPIO.LOW)
+
+    def __sendBit(self):
+        self.__ledOn()
+        sleep(400/1000)
+        self.__ledOff()
+        sleep(400/1000)
+
     def __processTX(self):
         # GPIO.output(RGBr,GPIO.HIGH) 
         # GPIO.output(RGBr,GPIO.LOW)
         if not self.q.empty():
-            tx = self.q.get()
-            print('TX ',tx)
+            self.tx = int(self.q.get())
+            self.__sendBit()
+            print('TX ',self.tx)
             self.q.task_done()
             print('Remaining Queue Size: ',self.q.qsize())
 
@@ -71,4 +99,3 @@ class txvr:
         while True:
             self.__processRX()
             self.__processTX()
-            sleep(4)
