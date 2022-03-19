@@ -85,12 +85,26 @@ class txvr:
         self.__ledOff()
         sleep(400/1000)
 
+    def __sendByte(self):
+        msg = self.tx
+        for char in msg:
+            bitS = '{0:08b}'.format(ord(char))
+            print(bitS[0])
+            self.tx = int(bitS[0])+int(bitS[1])
+            self.__sendBit()
+            self.tx = int(bitS[2])+int(bitS[3])
+            self.__sendBit()
+            self.tx = int(bitS[4])+int(bitS[5])
+            self.__sendBit()
+            self.tx = int(bitS[6])+int(bitS[7])
+            self.__sendBit()
+
     def __processTX(self):
         # GPIO.output(RGBr,GPIO.HIGH) 
         # GPIO.output(RGBr,GPIO.LOW)
         if not self.q.empty():
-            self.tx = int(self.q.get())
-            self.__sendBit()
+            self.tx = self.q.get()
+            self.__sendByte()
             print('TX ',self.tx)
             self.q.task_done()
             print('Remaining Queue Size: ',self.q.qsize())
