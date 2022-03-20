@@ -25,7 +25,7 @@ GPIO.setup(RGBb,GPIO.OUT) #BLUE
 class txvr:
     def __init__(self):
         self.rxP = -1
-        self.rxByte = '00000000'
+        self.rxByte = [0,0,0,0,0,0,0,0,0,0]
         self.rxByteIter = 0
         self.txrBitLen = 10
         self.msgs = []
@@ -46,6 +46,7 @@ class txvr:
         
     def __readBit(self):
         value = floor(AnalogIn(ads, ADS.P0).voltage*100)/100
+        # if 3365 < value and value < 3395: return 0 #G 3576 0.44
         if value == 0.47: return 0  #G 3740 0.47
         if value == 0.46: return 1  #B 3610 0.46
         if value == 0.49: return 2  #R 3890 0.49
@@ -54,22 +55,26 @@ class txvr:
 
     def __keepBit(self):
         if self.rx == 0:
-            self.rxByte[self.rxByteIter] = 0
-            self.rxByte[self.rxByteIter+1] = 0
+            self.rxByte[self.rxByteIter] = '0'
+            self.rxByte[self.rxByteIter+1] = '0'
         elif self.rx == 1:
-            self.rxByte[self.rxByteIter] = 0
-            self.rxByte[self.rxByteIter+1] = 1
+            self.rxByte[self.rxByteIter] = '0'
+            self.rxByte[self.rxByteIter+1] = '1'
         elif self.rx == 2:
-            self.rxByte[self.rxByteIter] = 1
-            self.rxByte[self.rxByteIter+1] = 0
+            self.rxByte[self.rxByteIter] = '1'
+            self.rxByte[self.rxByteIter+1] = '0'
         elif self.rx == 3:
-            self.rxByte[self.rxByteIter] = 1
-            self.rxByte[self.rxByteIter+1] = 1
+            self.rxByte[self.rxByteIter] = '1'
+            self.rxByte[self.rxByteIter+1] = '1'
         
-        if self.rxByteIter == self.txrBitLen-2:
-            self.msgs.append(int(f'0b{self.rxByte}',2))
+        if self.rxByteIter == (self.txrBitLen-2):
+            msg = chr(int(f'0b{"".join(self.rxByte[0:8])}',2))
+            print(self.rxByte)
+            self.msgs.append(msg)
             self.trimMsgs()
         self.rxByteIter += 2
+        if self.rxByteIter == 10:
+            self.rxByteIter = 0
 
     def __processRX(self):
         self.rx = self.__readBit()
@@ -114,9 +119,10 @@ class txvr:
         for char in msg:
             bitS = '{0:08b}'.format(ord(char))
             for i in range(0,8,2):
-                self.tx = int(bitS[i])+int(bitS[+1])
-                parity += self.tx
+                self.tx = int(bitS[i])*2+int(bitS[i+1])
                 self.__sendBit()
+                parity += self.tx
+                print("TX Data:",bitS[i],bitS[i+1],self.tx)
             self.tx = parity % 2
             self.__sendBit()
             print("TX Data:",bitS,self.tx)
