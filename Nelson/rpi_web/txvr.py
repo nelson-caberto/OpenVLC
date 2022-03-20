@@ -28,6 +28,9 @@ class txvr:
         self.rxByte = [0,0,0,0,0,0,0,0,0,0]
         self.rxByteIter = 0
         self.txrBitLen = 10
+        self.newMsg = True
+        self.currentMsg = ''
+        self.msgLen = 0
         self.msgs = []
         self.q = Queue()
         self.process_t = Thread(target=self.__process)
@@ -47,10 +50,10 @@ class txvr:
     def __readBit(self):
         value = floor(AnalogIn(ads, ADS.P0).voltage*100)/100
         # if 3365 < value and value < 3395: return 0 #G 3576 0.44
-        if value == 0.47: return 0  #G 3740 0.47
-        if value == 0.46: return 1  #B 3610 0.46
-        if value == 0.49: return 2  #R 3890 0.49
-        if value == 0.52: return 3  #RGB 4120 0.51
+        if value == 0.49: return 0  #G
+        if value == 0.48: return 1  #B
+        if value == 0.50: return 2  #R
+        if value == 0.53: return 3  #RGB
         return -1
 
     def __keepBit(self):
@@ -70,8 +73,18 @@ class txvr:
         if self.rxByteIter == (self.txrBitLen-2):
             msg = chr(int(f'0b{"".join(self.rxByte[0:8])}',2))
             print(self.rxByte)
-            self.msgs.append(msg)
-            self.trimMsgs()
+            if self.newMsg:
+                self.newMsg = False
+                self.currentMsg = ''
+                self.msgLen = int(msg)
+            else:
+                self.currentMsg+=msg
+
+            if len(self.currentMsg) == self.msgLen:
+                self.msgs.append(self.currentMsg)
+                self.trimMsgs()
+                self.newMsg = True
+
         self.rxByteIter += 2
         if self.rxByteIter == 10:
             self.rxByteIter = 0
@@ -131,7 +144,11 @@ class txvr:
         # GPIO.output(RGBr,GPIO.HIGH) 
         # GPIO.output(RGBr,GPIO.LOW)
         if not self.q.empty():
-            self.tx = self.q.get()
+            m = self.q.get()
+            self.tx = str(len(m))
+            self.__sendByte()
+            print('TX ',self.tx)
+            self.tx = m
             self.__sendByte()
             print('TX ',self.tx)
             self.q.task_done()
