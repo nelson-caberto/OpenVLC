@@ -25,6 +25,9 @@ GPIO.setup(RGBb,GPIO.OUT) #BLUE
 class txvr:
     def __init__(self):
         self.rxP = -1
+        self.rxByte = '00000000'
+        self.rxByteIter = 0
+        self.txrBitLen = 10
         self.msgs = []
         self.q = Queue()
         self.process_t = Thread(target=self.__process)
@@ -49,6 +52,25 @@ class txvr:
         if value == 0.52: return 3  #RGB 4120 0.51
         return -1
 
+    def __keepBit(self):
+        if self.rx == 0:
+            self.rxByte[self.rxByteIter] = 0
+            self.rxByte[self.rxByteIter+1] = 0
+        elif self.rx == 1:
+            self.rxByte[self.rxByteIter] = 0
+            self.rxByte[self.rxByteIter+1] = 1
+        elif self.rx == 2:
+            self.rxByte[self.rxByteIter] = 1
+            self.rxByte[self.rxByteIter+1] = 0
+        elif self.rx == 3:
+            self.rxByte[self.rxByteIter] = 1
+            self.rxByte[self.rxByteIter+1] = 1
+        
+        if self.rxByteIter == self.txrBitLen-2:
+            self.msgs.append(int(f'0b{self.rxByte}',2))
+            self.trimMsgs()
+        self.rxByteIter += 2
+
     def __processRX(self):
         self.rx = self.__readBit()
         if self.rx != self.rxP:
@@ -57,8 +79,9 @@ class txvr:
         if self.rx != self.rxP:
             if self.rx != -1:
                 print('RX ',self.rx)
-                self.msgs.append(self.rx)
-                self.trimMsgs()
+                self.__keepBit()
+                # self.msgs.append(self.rx)
+                # self.trimMsgs()
             self.rxP = self.rx
 	
     def __ledOn(self):
@@ -96,6 +119,7 @@ class txvr:
                 self.__sendBit()
             self.tx = parity % 2
             self.__sendBit()
+            print("TX Data:",bitS,self.tx)
 
     def __processTX(self):
         # GPIO.output(RGBr,GPIO.HIGH) 
