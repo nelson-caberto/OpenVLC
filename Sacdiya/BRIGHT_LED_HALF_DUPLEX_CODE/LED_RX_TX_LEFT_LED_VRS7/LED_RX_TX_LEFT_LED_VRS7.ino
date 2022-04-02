@@ -1,18 +1,18 @@
-//Sends String with acknowledgments
+//Sends String with acknowledgments (green tape LED) only prints acknowledgement on screen, does not know what to do with it yet
 
 #define PR_Pin    0
 #define LED_Pin 10
 
 
-#define TX_ON_DELAY  500  //how long to wait after turning on the LED
-#define TX_OFF_DELAY 200  //how long to wait after turning off the LED
+#define TX_ON_DELAY  300  //how long to wait after turning on the LED
+#define TX_OFF_DELAY 80  //how long to wait after turning off the LED
 
-#define RX_DELAY    400  //if RX input changes, wait before getting actual reading
+#define RX_DELAY    40  //if RX input changes, wait before getting actual reading
 
 //these are specific to each LED, lamp, etc
-#define RX0_LO  11
-#define RX0_HI  300
-#define RX1_LO  680
+#define RX0_LO  100
+#define RX0_HI  200
+#define RX1_LO  630
 #define RX1_HI  750
 
 
@@ -52,7 +52,7 @@ byte readBit() {
   long prAVG = 0;
   for (int i = 0; i<RX_READS; i++) prAVG += analogRead(PR_Pin);
   prAVG /= RX_READS;
-//  if (prAVG>10){
+//  if (prAVG>1){
 //      Serial.println(prAVG);
 //
 //  }
@@ -92,7 +92,7 @@ int toDec() {
   return rxVal[7]*1 + rxVal[6]*2 + rxVal[5]*4 + rxVal[4]*8 + rxVal[3]*16 + rxVal[2]*32 + rxVal[1]*64 + rxVal[0]*128;
 }
 void keepBit(){
-  delay(50);
+  //  delay(50);
   if(ackSignal == 0){
      rxVal[iterator] = rx;
      iterator = iterator + 1;
@@ -123,7 +123,7 @@ void keepBit(){
       Serial.println();
       messageRX = "";
       paritychecker = 0;
-      delay(100);
+//      delay(100);
       sendAck();
    }
    if (ackSignal ==1 & iteratorAck != 2){
@@ -151,11 +151,12 @@ void keepBit(){
 void sendAck(){
   if(paritychecker == 0){
     Serial.println("Sending Acknowledgment of:");
+    delay(350);
     for(int i = 0; i<2; i++){
       tx = 1;
       Serial.print(tx);
       sendBit();
-      delay(50);
+//      delay(50);
     }
     Serial.println();
   }
@@ -167,13 +168,13 @@ void sendTXByte() { //message length transmit
       tx=0;
       sendBit();
       Serial.print(tx);
-      delay(400);
+//      delay(400);
 
     } else if (txBits[i]==1) { 
       tx=1;
       sendBit();
       Serial.print(tx);
-      delay(400);
+//      delay(400);
 
     } 
     delay(50);
@@ -199,6 +200,7 @@ void showRXAck() {
   Serial.println();
   Serial.print("Received An Acknowledgement of: ");
   Serial.print(rxAck[0]);
+  Serial.println();
 
 
 //  Serial.println();
@@ -304,16 +306,16 @@ void sendByte() {
       tx=0;
       sendBit();
       Serial.print(tx);
-      delay(400);
+//      delay(400);
 
     } else if (bits[i]==1) { 
       tx=1;
       sendBit();
       Serial.print(tx);
-      delay(400);
+//      delay(400);
 
     } 
-    delay(50);
+//    delay(50);
   }
   Serial.println();
 }
@@ -341,7 +343,7 @@ void processTX() {
     Serial.print("Message:");
     Serial.print(message);
     messageLength();
-    delay(500);
+//    delay(500);
     sendString(message);
   }
 }

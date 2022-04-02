@@ -1,12 +1,11 @@
-//Sends String with acknowledgments only prints acknowledgement on screen, does not know what to do with it yet
-
+//Sends String with acknowledgments and determines if it needs to resend or not
 
 #define PR_Pin    0
 #define LED_Pin 10
 
 
 #define TX_ON_DELAY  300  //how long to wait after turning on the LED
-#define TX_OFF_DELAY 60  //how long to wait after turning off the LED
+#define TX_OFF_DELAY 80  //how long to wait after turning off the LED
 
 #define RX_DELAY    40  //if RX input changes, wait before getting actual reading
 
@@ -15,6 +14,7 @@
 #define RX0_HI  300
 #define RX1_LO  650
 #define RX1_HI  800
+
 
 
 #define RX_READS 7
@@ -41,7 +41,7 @@ String messageRX = "";
 byte txBits[bitlength]={0,0,0,0,0,0,0,0,0};
 
 int numRX;
-
+int rxIterator = 0;
 void setup() {
   pinMode(PR_Pin, INPUT);
   pinMode(LED_Pin, OUTPUT);
@@ -92,7 +92,7 @@ int toDec() {
   return rxVal[7]*1 + rxVal[6]*2 + rxVal[5]*4 + rxVal[4]*8 + rxVal[3]*16 + rxVal[2]*32 + rxVal[1]*64 + rxVal[0]*128;
 }
 void keepBit(){
-//  delay(50);
+  //  delay(50);
   if(ackSignal == 0){
      rxVal[iterator] = rx;
      iterator = iterator + 1;
@@ -196,12 +196,12 @@ void showRXAck() {
   Serial.print("Received An Acknowledgement Data of: ");
   for (int i = 0; i<2; i++){
     Serial.print(rxAck[i]);
+    rxIterator = rxIterator + 1;
   }
   Serial.println();
   Serial.print("Received An Acknowledgement of: ");
   Serial.print(rxAck[0]);
   Serial.println();
-
 
 //  Serial.println();
 //  Serial.println(parityBit%2);
@@ -210,6 +210,18 @@ void showRXAck() {
 //  if (rxVal[0] =! rxVal[1]) {
 //    Serial.println("Parity Bit Fail - Need to Retransmit Acknowledgment");
 //  }
+}
+void checkRXAck(){
+  if(rxVal[0] !=1 & rxVal[1]!=1 & rxIterator == 2){
+    Serial.println("Message was recieved incorrectly, Resending...");
+    sendMessage();
+    rxIterator = 0;
+
+  }
+  else {
+    Serial.println("Message was recieved correctly");
+    rxIterator = 0;
+  }
 }
 void showRXLenBits() {
   parityBit = 0;
@@ -256,11 +268,11 @@ void showRXBits() {
 //  Serial.println();
 //  Serial.println(parityBit%2);
 //  Serial.println(rxVal[8]);
-
-  if (rxVal[bitlength-1]!=parityBit%2) {
-    Serial.println("Parity Bit Fail - Need to Retransmit Data");
-    paritychecker = paritychecker + 1;
-  }
+//
+//  if (rxVal[bitlength-1]!=parityBit%2) {
+//    Serial.println("Parity Bit Fail - Need to Retransmit Data");
+//    paritychecker = paritychecker + 1;
+//  }
 }
 
 void processRX() {
@@ -315,7 +327,7 @@ void sendByte() {
 //      delay(400);
 
     } 
-    delay(50);
+//    delay(50);
   }
   Serial.println();
 }
@@ -334,17 +346,21 @@ void sendString(String s) {
     showBits();
     sendByte();
   }
-}
+  rxIterator = 0;
 
+}
+void sendMessage(){
+  messageLength();
+  sendString(message);
+  checkRXAck();
+}
 void processTX() {
   if (Serial.available() > 0) {
     Serial.println("Waiting for a message:");
     message = Serial.readString();
     Serial.print("Message:");
     Serial.print(message);
-    messageLength();
-//    delay(500);
-    sendString(message);
+    sendMessage();
   }
 }
 
